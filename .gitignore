@@ -221,3 +221,6 @@ __marimo__/
 
 # STS2 run history
 *.run
+
+# DB
+*.db
