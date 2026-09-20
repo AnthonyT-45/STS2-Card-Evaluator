@@ -3,11 +3,11 @@
 To run (in root):
 
 ```bash
-python scorer\src\spire\main.py
+make run
 ```
 
-To view DB:
+To view DB (in root):
 
 ```bash
-uv run python -m sqlite3 scorer\runs.db
+make view-db
 ```
