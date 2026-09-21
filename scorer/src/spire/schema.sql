@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS card_choices (
     run_id TEXT NOT NULL REFERENCES runs(run_id),
     act_index INTEGER NOT NULL,
     floor_index INTEGER NOT NULL,
+    round_num INTEGER NOT NULL,
     option_index INTEGER NOT NULL,
     act TEXT,
     map_point_type TEXT NOT NULL,
@@ -55,7 +56,19 @@ CREATE TABLE IF NOT EXISTS card_choices (
     enchantment_id TEXT,
     enchantment_amount INTEGER,
     was_picked INTEGER NOT NULL,
-    PRIMARY KEY (run_id, act_index, floor_index, option_index)
+    PRIMARY KEY (run_id, act_index, floor_index, round_num, option_index)
 );
 
 CREATE INDEX IF NOT EXISTS idx_card_choices_card_id ON card_choices(card_id);
+
+CREATE TABLE IF NOT EXISTS deck_events (
+    run_id TEXT NOT NULL REFERENCES runs(run_id),
+    round INTEGER NOT NULL,
+    seq INTEGER NOT NULL,
+    event_type TEXT NOT NULL,
+    card_id TEXT NOT NULL,
+    related_card_id TEXT,
+    enchantment_id TEXT,
+    enchantment_amount INTEGER,
+    PRIMARY KEY (run_id, round, seq)
+);

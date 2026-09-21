@@ -4,6 +4,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+REWARD_SIZE = 3
+
+
+def split_rounds(choices, map_point_type):
+    if (
+        map_point_type != "shop"
+        and len(choices) > REWARD_SIZE
+        and len(choices) % REWARD_SIZE == 0
+    ):
+        return [
+            choices[i : i + REWARD_SIZE] for i in range(0, len(choices), REWARD_SIZE)
+        ]
+    return [choices] if choices else []
+
+
 def read_card_choices(run_id, player_id, acts, map_point_history):
     rows = []
     for act_index, act in enumerate(map_point_history):
@@ -14,28 +29,32 @@ def read_card_choices(run_id, player_id, acts, map_point_history):
                 if stats["player_id"] != player_id:
                     continue
                 choices = stats.get("card_choices") or []
-                option_count = len(choices)
-                picked_count = sum(1 for c in choices if c["was_picked"])
-                for option_index, choice in enumerate(choices):
-                    card = choice["card"]
-                    enchantment = card.get("enchantment") or {}
-                    rows.append(
-                        (
-                            run_id,
-                            act_index,
-                            floor_index,
-                            option_index,
-                            act_name,
-                            map_point_type,
-                            option_count,
-                            picked_count,
-                            card["id"],
-                            card.get("current_upgrade_level"),
-                            enchantment.get("id"),
-                            enchantment.get("amount"),
-                            choice["was_picked"],
+                for round_num, round_choices in enumerate(
+                    split_rounds(choices, map_point_type)
+                ):
+                    option_count = len(round_choices)
+                    picked_count = sum(1 for c in round_choices if c["was_picked"])
+                    for option_index, choice in enumerate(round_choices):
+                        card = choice["card"]
+                        enchantment = card.get("enchantment") or {}
+                        rows.append(
+                            (
+                                run_id,
+                                act_index,
+                                floor_index,
+                                round_num,
+                                option_index,
+                                act_name,
+                                map_point_type,
+                                option_count,
+                                picked_count,
+                                card["id"],
+                                card.get("current_upgrade_level"),
+                                enchantment.get("id"),
+                                enchantment.get("amount"),
+                                choice["was_picked"],
+                            )
                         )
-                    )
     return rows
 
 

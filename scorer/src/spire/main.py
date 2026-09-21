@@ -34,10 +34,10 @@ potions_insert = """
     """
 card_choices_insert = """
     INSERT OR REPLACE INTO card_choices (
-        run_id, act_index, floor_index, option_index, act, map_point_type,
-        option_count, picked_count, card_id, current_upgrade_level,
-        enchantment_id, enchantment_amount, was_picked
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        run_id, act_index, floor_index, round_num, option_index, act,
+        map_point_type, option_count, picked_count, card_id,
+        current_upgrade_level, enchantment_id, enchantment_amount, was_picked
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
 
