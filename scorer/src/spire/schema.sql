@@ -63,12 +63,13 @@ CREATE INDEX IF NOT EXISTS idx_card_choices_card_id ON card_choices(card_id);
 
 CREATE TABLE IF NOT EXISTS deck_events (
     run_id TEXT NOT NULL REFERENCES runs(run_id),
-    round INTEGER NOT NULL,
+    act_index INTEGER NOT NULL,
+    floor_index INTEGER NOT NULL,
     seq INTEGER NOT NULL,
     event_type TEXT NOT NULL,
     card_id TEXT NOT NULL,
     related_card_id TEXT,
     enchantment_id TEXT,
     enchantment_amount INTEGER,
-    PRIMARY KEY (run_id, round, seq)
+    PRIMARY KEY (run_id, act_index, floor_index, seq)
 );

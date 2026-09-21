@@ -58,6 +58,43 @@ def read_card_choices(run_id, player_id, acts, map_point_history):
     return rows
 
 
+def read_deck_events(run_id, player_id, map_point_history):
+    rows = []
+    for act_index, act in enumerate(map_point_history):
+        for floor_index, floor in enumerate(act):
+            for stats in floor.get("player_stats", []):
+                if stats["player_id"] != player_id:
+                    continue
+                events = []
+                for c in stats.get("cards_removed", []):
+                    events.append(("remove", c["id"], None, None, None))
+                for t in stats.get("cards_transformed", []):
+                    events.append(
+                        (
+                            "transform",
+                            t["original_card"]["id"],
+                            t["final_card"]["id"],
+                            None,
+                            None,
+                        )
+                    )
+                for card_id in stats.get("upgraded_cards", []):
+                    events.append(("upgrade", card_id, None, None, None))
+                for card_id in stats.get("downgraded_cards", []):
+                    events.append(("downgrade", card_id, None, None, None))
+                for e in stats.get("cards_enchanted", []):
+                    amount = (e["card"].get("enchantment") or {}).get("amount")
+                    events.append(
+                        ("enchant", e["card"]["id"], None, e["enchantment"], amount)
+                    )
+                for c in stats.get("cards_gained", []):
+                    events.append(("gain", c["id"], None, None, None))
+
+                for seq, event in enumerate(events):
+                    rows.append((run_id, act_index, floor_index, seq, *event))
+    return rows
+
+
 def read_data(fp):
     if not fp.is_dir():
         raise FileNotFoundError(f"No such directory: {fp}")
@@ -129,7 +166,13 @@ def read_data(fp):
                         data["map_point_history"],
                     )
 
-                    yield (run_row, card_rows, relic_rows, potion_rows, choice_rows)
+                    deck_event_rows = read_deck_events(
+                        run_id,
+                        player["id"],
+                        data["map_point_history"],
+                    )
+
+                    yield (run_row, card_rows, relic_rows, potion_rows, choice_rows, deck_event_rows)
 
                 logger.info(f"Success: read .run file: {file.name}")
             except json.JSONDecodeError:

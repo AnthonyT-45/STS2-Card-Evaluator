@@ -39,19 +39,25 @@ card_choices_insert = """
         current_upgrade_level, enchantment_id, enchantment_amount, was_picked
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
-
+deck_events_insert = """
+    INSERT OR REPLACE INTO deck_events (
+        run_id, act_index, floor_index, seq, event_type, card_id,
+        related_card_id, enchantment_id, enchantment_amount
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
 
 def connect_db():
     conn = sqlite3.connect(db_path)
     try:
         conn.executescript(schema_path.read_text(encoding="utf-8"))
         with conn:
-            for run_row, cards, relics, potions, choices in parser.read_data(fp):
+            for run_row, cards, relics, potions, choices, deck_events in parser.read_data(fp):
                 conn.execute(runs_insert, run_row)
                 conn.executemany(cards_insert, cards)
                 conn.executemany(relics_insert, relics)
                 conn.executemany(potions_insert, potions)
                 conn.executemany(card_choices_insert, choices)
+                conn.executemany(deck_events_insert, deck_events)
     finally:
         conn.close()
 
