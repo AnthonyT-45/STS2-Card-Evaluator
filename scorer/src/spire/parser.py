@@ -172,7 +172,14 @@ def read_data(fp):
                         data["map_point_history"],
                     )
 
-                    yield (run_row, card_rows, relic_rows, potion_rows, choice_rows, deck_event_rows)
+                    yield (
+                        run_row,
+                        card_rows,
+                        relic_rows,
+                        potion_rows,
+                        choice_rows,
+                        deck_event_rows,
+                    )
 
                 logger.info(f"Success: read .run file: {file.name}")
             except json.JSONDecodeError:

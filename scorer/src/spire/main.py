@@ -46,18 +46,25 @@ deck_events_insert = """
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
+
+def load_db(conn, fp):
+    conn.executescript(schema_path.read_text(encoding="utf-8"))
+    with conn:
+        for run_row, cards, relics, potions, choices, deck_events in parser.read_data(
+            fp
+        ):
+            conn.execute(runs_insert, run_row)
+            conn.executemany(cards_insert, cards)
+            conn.executemany(relics_insert, relics)
+            conn.executemany(potions_insert, potions)
+            conn.executemany(card_choices_insert, choices)
+            conn.executemany(deck_events_insert, deck_events)
+
+
 def connect_db():
     conn = sqlite3.connect(db_path)
     try:
-        conn.executescript(schema_path.read_text(encoding="utf-8"))
-        with conn:
-            for run_row, cards, relics, potions, choices, deck_events in parser.read_data(fp):
-                conn.execute(runs_insert, run_row)
-                conn.executemany(cards_insert, cards)
-                conn.executemany(relics_insert, relics)
-                conn.executemany(potions_insert, potions)
-                conn.executemany(card_choices_insert, choices)
-                conn.executemany(deck_events_insert, deck_events)
+        load_db(conn, fp)
     finally:
         conn.close()
 
